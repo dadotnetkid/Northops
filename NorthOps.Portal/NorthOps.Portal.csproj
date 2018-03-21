@@ -390,6 +390,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Models\RoleStore.cs" />
+    <Compile Include="Provider\ApplicationOAuthProvider.cs" />
     <Compile Include="Repository\Bootstrap.cs" />
     <Compile Include="Repository\Excel.cs" />
     <Compile Include="Repository\GenericRepository.cs" />
