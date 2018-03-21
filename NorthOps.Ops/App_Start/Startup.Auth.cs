@@ -8,9 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Microsoft.Owin.Security.OAuth;
+using NorthOps.Ops.Provider;
 
 namespace NorthOps.Ops {
     public partial class Startup {
+        public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
+        public static string PublicClientId { get; private set; }
+        
         public void ConfigureAuth(IAppBuilder app) {
             app.CreatePerOwinContext(NorthOpsEntities.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
@@ -28,6 +33,19 @@ namespace NorthOps.Ops {
                        regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager))
                 }
             });
+            PublicClientId = "self";
+            OAuthOptions = new OAuthAuthorizationServerOptions
+            {
+                TokenEndpointPath = new PathString("/Token"),
+                Provider = new ApplicationOAuthProvider(PublicClientId),
+                AuthorizeEndpointPath = new PathString("/api/Account/ExternalLogin"),
+                AccessTokenExpireTimeSpan = TimeSpan.FromDays(14),
+                // In production mode set AllowInsecureHttp = false
+                AllowInsecureHttp = true
+            };
+
+            // Enable the application to use bearer tokens to authenticate users
+            app.UseOAuthBearerTokens(OAuthOptions);
         }
     }
 }
