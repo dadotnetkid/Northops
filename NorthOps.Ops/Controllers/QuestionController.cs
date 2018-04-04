@@ -1,4 +1,6 @@
 ﻿using DevExpress.Web.Mvc;
+using NorthOps.Ops.ApiRepository;
+using NorthOps.Ops.Models;
 using NorthOps.Ops.Repository;
 using System;
 using System.Collections.Generic;
@@ -11,6 +13,8 @@ namespace NorthOps.Ops.Controllers
     public class QuestionController : Controller
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
+        private ApiGenericRepository apiRepo = new ApiGenericRepository();
+        #region Question Grid
         public ActionResult Index()
         {
             return View();
@@ -19,8 +23,8 @@ namespace NorthOps.Ops.Controllers
         [ValidateInput(false)]
         public ActionResult QuestionGridPartial()
         {
-            var model = new object[0];
-            return PartialView("_QuestionGridPartial", unitOfWork.QuestionRepo.Get(includeProperties: "Exam"));
+            var model = new ApiGenericRepository().GetFetch<IEnumerable<Question>>("api/question"); //unitOfWork.QuestionRepo.Get(includeProperties: "Exam");
+            return PartialView("_QuestionGridPartial", model);
         }
 
         [HttpPost, ValidateInput(false)]
@@ -31,8 +35,7 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    unitOfWork.QuestionRepo.Insert(item);
-                    unitOfWork.Save();
+                    new ApiGenericRepository().Insert("api/question", item);
                 }
                 catch (Exception e)
                 {
@@ -41,27 +44,9 @@ namespace NorthOps.Ops.Controllers
             }
             else
                 ViewData["EditError"] = "Please, correct all errors.";
-            return PartialView("_QuestionGridPartial", unitOfWork.QuestionRepo.Get(includeProperties: "Exam"));
+            return PartialView("_QuestionGridPartial", new ApiGenericRepository().GetFetch<IEnumerable<Question>>("api/question"));
         }
-        [HttpPost, ValidateInput(false)]
-        public ActionResult QuestionGridPartialUpdate(NorthOps.Ops.Models.Question item)
-        {
-            var model = new object[0];
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // Insert here a code to update the item in your model
-                }
-                catch (Exception e)
-                {
-                    ViewData["EditError"] = e.Message;
-                }
-            }
-            else
-                ViewData["EditError"] = "Please, correct all errors.";
-            return PartialView("_QuestionGridPartial", model);
-        }
+
         [HttpPost, ValidateInput(false)]
         public ActionResult QuestionGridPartialDelete(System.Guid? QuestionId)
         {
@@ -70,43 +55,37 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    var questionRepo = unitOfWork.QuestionRepo.GetByID(QuestionId);
-                    unitOfWork.QuestionRepo.Delete(questionRepo);
-                    unitOfWork.Save();
+                    new ApiGenericRepository().Delete($"api/question/delete/{QuestionId}");
                 }
                 catch (Exception e)
                 {
                     ViewData["EditError"] = e.Message;
                 }
             }
-            return PartialView("_QuestionGridPartial", unitOfWork.QuestionRepo.Get(includeProperties: "Exam"));
+            return PartialView("_QuestionGridPartial", new ApiGenericRepository().GetFetch<IEnumerable<Question>>("api/question"));
         }
+        #endregion
+
 
         [ValidateInput(false)]
         public ActionResult ChoicesGridPartial(Guid QuestionId, System.Guid? ChoiceId)
         {
-            var model = unitOfWork.ChoiceRepo.Get(filter: m => m.QuestionId == QuestionId, includeProperties: "Question");
+            var model = apiRepo.GetFetch<IEnumerable<Choice>>($"api/choice/{QuestionId}/{ChoiceId}");
             ViewBag.QuestionId = QuestionId;
-            if (ChoiceId != null)
-            {
-                model = unitOfWork.ChoiceRepo.Get(filter: m => m.ChoiceId == ChoiceId, includeProperties: "Question");
-            }
-
             return PartialView("_ChoicesGridPartial", model);
         }
 
         [HttpPost, ValidateInput(false)]
         public ActionResult ChoicesGridPartialAddNew(NorthOps.Ops.Models.Choice item)
         {
-            var model = new object[0];
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    item.ChoiceId = Guid.NewGuid();
-                    item.DateCreated = DateTime.Now;
-                    unitOfWork.ChoiceRepo.Insert(item);
-                    unitOfWork.Save();
+                    var res = apiRepo.Insert("api/Choice", item);
+                    if(res!=System.Net.HttpStatusCode.OK)
+                        ViewData["EditError"] = res.ToString();
                 }
                 catch (Exception e)
                 {
@@ -116,27 +95,9 @@ namespace NorthOps.Ops.Controllers
             else
                 ViewData["EditError"] = "Please, correct all errors.";
             ViewBag.QuestionId = item.QuestionId;
-            return PartialView("_ChoicesGridPartial", unitOfWork.ChoiceRepo.Get(filter: m => m.QuestionId == item.QuestionId, includeProperties: "Question"));
+            return PartialView("_ChoicesGridPartial", apiRepo.GetFetch<IEnumerable<Choice>>($"api/choice/{item.QuestionId}"));
         }
-        [HttpPost, ValidateInput(false)]
-        public ActionResult ChoicesGridPartialUpdate(NorthOps.Ops.Models.Choice item, Guid? ChoiceId)
-        {
-            var model = new object[0];
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // Insert here a code to update the item in your model
-                }
-                catch (Exception e)
-                {
-                    ViewData["EditError"] = e.Message;
-                }
-            }
-            else
-                ViewData["EditError"] = "Please, correct all errors.";
-            return PartialView("_ChoicesGridPartial", model);
-        }
+       
         [HttpPost, ValidateInput(false)]
         public ActionResult ChoicesGridPartialDelete(System.Guid ChoiceId, System.Guid QuestionId)
         {
@@ -147,16 +108,14 @@ namespace NorthOps.Ops.Controllers
                 try
                 {
 
-                    var choice = unitOfWork.ChoiceRepo.GetByID(ChoiceId);
-                    unitOfWork.ChoiceRepo.Delete(choice);
-                    unitOfWork.Save();
+                    apiRepo.Delete($"api/Choice/delete/{ChoiceId}");
                 }
                 catch (Exception e)
                 {
                     ViewData["EditError"] = e.Message;
                 }
             }
-            return PartialView("_ChoicesGridPartial", unitOfWork.ChoiceRepo.Get(filter: m => m.QuestionId == QuestionId, includeProperties: "Question"));
+            return PartialView("_ChoicesGridPartial", apiRepo.GetFetch<IEnumerable<Choice>>($"api/choice/{QuestionId}"));
         }
     }
 }

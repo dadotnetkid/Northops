@@ -1,15 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
-namespace NorthOps.Ops.Models
+namespace NorthOps.Api.Models
 {
     public partial class JobApplication
     {
-        [NotMapped,JsonIgnore]
         public string MBTIResult
         {
             get
@@ -18,7 +15,6 @@ namespace NorthOps.Ops.Models
                 return mbti == null ? "" : ((mbti.E ?? 0) > (mbti.I ?? 0) ? "E" : "I") + ((mbti.S ?? 0) > (mbti.N ?? 0) ? "S" : "N") + "" + ((mbti.T ?? 0) > (mbti.F ?? 0) ? "T" : "F") + ((mbti.J ??0) > (mbti.P ??0) ? "J" : "P");
             }
         }
-        [NotMapped, JsonIgnore]
         public double? ApplicantExamScore
         {
             get

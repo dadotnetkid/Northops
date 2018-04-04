@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using NorthOps.Ops.ApiRepository;
 using NorthOps.Ops.Models;
 using NorthOps.Ops.Repository;
 using System;
@@ -66,23 +67,32 @@ namespace NorthOps.Ops.Controllers
             {
                 return View(model);
             }
+            ApiGenericRepository api = new ApiGenericRepository();
+            var result = await api.Login(model.Email, model.Password);
+            if (result.Succeeded)
+                return RedirectToLocal(returnUrl);
+            else
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-            }
+            //var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            //switch (result)
+            //{
+            //    case SignInStatus.Success:
+            //        return RedirectToLocal(returnUrl);
+            //    case SignInStatus.LockedOut:
+            //        return View("Lockout");
+            //    case SignInStatus.RequiresVerification:
+            //        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+            //    case SignInStatus.Failure:
+            //    default:
+            //        ModelState.AddModelError("", "Invalid login attempt.");
+            //        return View(model);
+            //}
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -92,13 +102,13 @@ namespace NorthOps.Ops.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-       
+
         #region Profile
 
         public new ActionResult Profile(string Id)
         {
-            var user = unitOfWork.UserRepository.GetByID(Id ?? User.Identity.GetUserId());
-
+            //var user = unitOfWork.UserRepository.GetByID(Id ?? User.Identity.GetUserId());
+            var user = new ApiGenericRepository().GetFetch<User>($"api/member/profile/{Id ?? User.Identity.GetUserId()}");
             return View(user);
         }
         [HttpPost]
@@ -107,23 +117,23 @@ namespace NorthOps.Ops.Controllers
             var user = new User();
             if (ModelState.IsValid)
             {
-                user = await UserManager.FindByIdAsync(model.Id);
-
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-                user.MiddleName = model.MiddleName;
-                user.Gender = model.Gender;
-                user.BirthDate = model.BirthDate;
-                user.AddressLine1 = model.AddressLine1;
-                user.AddressLine2 = model.AddressLine2;
-                user.TownCity = model.TownCity;
-                user.Cellular = model.Cellular;
-                user.Religion = model.Religion;
-                user.Citizenship = model.Citizenship;
-                user.Languages = model.Languages;
-                user.CivilStatus = model.CivilStatus;
-                user.Skills = model.Skills;
-                await UserManager.UpdateAsync(user);
+                await new ApiGenericRepository().Update("api/member/update", model);
+                /*user = await UserManager.FindByIdAsync(model.Id);
+                //user.FirstName = model.FirstName;
+                //user.LastName = model.LastName;
+                //user.MiddleName = model.MiddleName;
+                //user.Gender = model.Gender;
+                //user.BirthDate = model.BirthDate;
+                //user.AddressLine1 = model.AddressLine1;
+                //user.AddressLine2 = model.AddressLine2;
+                //user.TownCity = model.TownCity;
+                //user.Cellular = model.Cellular;
+                //user.Religion = model.Religion;
+                //user.Citizenship = model.Citizenship;
+                //user.Languages = model.Languages;
+                //user.CivilStatus = model.CivilStatus;
+                //user.Skills = model.Skills;
+                //await UserManager.UpdateAsync(user);*/
             }
             else
             {

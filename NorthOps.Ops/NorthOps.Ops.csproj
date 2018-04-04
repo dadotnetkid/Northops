@@ -218,18 +218,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiRepository\ApiGenericRepository.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\SecurityConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\ApplicantExamController.cs" />
     <Compile Include="Controllers\CampaignController.cs" />
     <Compile Include="Controllers\CategoryController.cs" />
     <Compile Include="Controllers\ExamController.cs" />
-    <Compile Include="Controllers\FileManagementDataController.cs" />
-    <Compile Include="Controllers\FileManagerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IdentityController.cs" />
     <Compile Include="Controllers\MaintenanceController.cs" />
@@ -538,16 +536,9 @@
     <Content Include="Content\js\jquery331\popper-utils.min.js.map" />
     <Content Include="Content\js\jquery331\popper-utils.js.map" />
     <Content Include="Views\Shared\_Exams.cshtml" />
-    <Content Include="Views\ApplicantExam\_ExamDescriptionPartial.cshtml" />
-    <Content Include="Views\ApplicantExam\_ExamsGridPartial.cshtml" />
-    <Content Include="Views\ApplicantExam\_TakeExamPartial.cshtml" />
-    <Content Include="Views\ApplicantExam\_TypingSpeed.cshtml" />
-    <Content Include="Views\ApplicantExam\Index.cshtml" />
     <Content Include="Views\Category\_CategoryViewPartial.cshtml" />
     <Content Include="Views\Category\Index.cshtml" />
     <Content Include="Views\Exam\Index.cshtml" />
-    <Content Include="Views\FileManager\_FileManagerPartial.cshtml" />
-    <Content Include="Views\FileManager\Index.cshtml" />
     <Content Include="Views\Home\_ApplicationStatusGridViewPartial.cshtml" />
     <Content Include="Views\Maintenance\_TownCityGridPartial.cshtml" />
     <Content Include="Views\Maintenance\TownCity.cshtml" />
@@ -577,8 +568,6 @@
     <Content Include="Views\Maintenance\UserRoles.cshtml" />
     <Content Include="Views\Maintenance\_UserRolesGridViewPartial.cshtml" />
     <Content Include="Views\Maintenance\_UserRoleAddEditPartial.cshtml" />
-    <Content Include="Views\FileManagementData\ProfileData.cshtml" />
-    <Content Include="Views\FileManagementData\_FilemanagementGridViewPartial.cshtml" />
     <Content Include="Views\Campaign\Index.cshtml" />
     <Content Include="Views\Campaign\_CampaignGridViewPartial.cshtml" />
     <Content Include="Views\Campaign\_CampaignAddEditGridViewPartial.cshtml" />

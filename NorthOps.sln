@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthOps.Portal", "NorthOps
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthOps.Ops", "NorthOps.Ops\NorthOps.Ops.csproj", "{55503759-0AA7-49F0-9E13-FCB2D4C852B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NorthOps.Api", "NorthOps.Api\NorthOps.Api.csproj", "{B775AD33-CC84-4A4C-B6BE-37B79CBD3237}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{55503759-0AA7-49F0-9E13-FCB2D4C852B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55503759-0AA7-49F0-9E13-FCB2D4C852B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55503759-0AA7-49F0-9E13-FCB2D4C852B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B775AD33-CC84-4A4C-B6BE-37B79CBD3237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B775AD33-CC84-4A4C-B6BE-37B79CBD3237}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B775AD33-CC84-4A4C-B6BE-37B79CBD3237}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B775AD33-CC84-4A4C-B6BE-37B79CBD3237}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -28,5 +34,4 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9B428B31-C34C-4395-9166-2C6CD4208F9F}
 	EndGlobalSection
-	
 EndGlobal
