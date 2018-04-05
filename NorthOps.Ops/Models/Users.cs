@@ -1,4 +1,5 @@
-﻿using NorthOps.Ops.Repository;
+﻿using NorthOps.Ops.ApiRepository;
+using NorthOps.Ops.Repository;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,7 +13,7 @@ namespace NorthOps.Ops.Models
         
         public string Password { get; set; }
         public string MemberRoles { get { return string.Join(Environment.NewLine, this.UserRoles.Select(x => x.Name)); } }
-        public IEnumerable<UserRole> Rolelist { get { return new UnitOfWork().RoleRepository.Get(); } }
+        public IEnumerable<UserRole> Rolelist { get { return new ApiGenericRepository().GetFetch<IEnumerable<UserRole>>("api/maintenance/role-list"); } }
         public string userRole { get; set; }
      
     }

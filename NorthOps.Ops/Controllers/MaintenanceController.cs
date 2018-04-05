@@ -1,6 +1,8 @@
 ﻿using DevExpress.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using NorthOps.Ops.ApiRepository;
 using NorthOps.Ops.Models;
+using NorthOps.Ops.Models.ViewModels;
 using NorthOps.Ops.Repository;
 using System;
 using System.Collections.Generic;
@@ -16,7 +18,8 @@ namespace NorthOps.Ops.Controllers
     public class MaintenanceController : IdentityController
     {
         private UnitOfWork unitOfWork = new UnitOfWork();
-
+        private ApiGenericRepository apiRepo = new ApiGenericRepository();
+        private UserViewModel userViewModel = new UserViewModel();
         public ActionResult Index()
         {
             return View();
@@ -31,34 +34,16 @@ namespace NorthOps.Ops.Controllers
         [ValidateInput(false)]
         public ActionResult TownCityGridPartial()
         {
-            ViewBag.States = unitOfWork.StateProvinceRepo.Get().Select(x => new { Id = x.StateProvinceId, Name = x.Name }).OrderBy(x => x.Name);
-            var model = new object[0];
-            return PartialView("_TownCityGridPartial", unitOfWork.TownCityRepo.Get(includeProperties: "AddressStateProvince"));
-        }
-
-        [HttpPost, ValidateInput(false)]
-        public ActionResult TownCityGridPartialAddNew(NorthOps.Ops.Models.AddressTownCity item)
-        {
-            var model = new object[0];
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // Insert here a code to insert the new item in your model
-                }
-                catch (Exception e)
-                {
-                    ViewData["EditError"] = e.Message;
-                }
-            }
-            else
-                ViewData["EditError"] = "Please, correct all errors.";
+            ViewBag.States = apiRepo.GetFetch<IEnumerable<AddressStateProvince>>("api/maintenance/state-province");
+            var model = apiRepo.GetFetch<IEnumerable<AddressStateProvince>>("api/maintenance/town-city");
+            //unitOfWork.TownCityRepo.Get(includeProperties: "AddressStateProvince")
             return PartialView("_TownCityGridPartial", model);
         }
+
+
         [HttpPost, ValidateInput(false)]
         public ActionResult TownCityGridPartialUpdate(NorthOps.Ops.Models.AddressTownCity item)
         {
-            var model = new object[0];
             if (ModelState.IsValid)
             {
                 try
@@ -73,7 +58,9 @@ namespace NorthOps.Ops.Controllers
             }
             else
                 ViewData["EditError"] = "Please, correct all errors.";
-            return PartialView("_TownCityGridPartial", unitOfWork.TownCityRepo.Get(includeProperties: "AddressStateProvince"));
+            var model = apiRepo.GetFetch<IEnumerable<AddressStateProvince>>("api/maintenance/town-city");
+            //unitOfWork.TownCityRepo.Get(includeProperties: "AddressStateProvince")
+            return PartialView("_TownCityGridPartial", model);
         }
         [HttpPost, ValidateInput(false)]
         public ActionResult TownCityGridPartialDelete(System.Int32 TownCityId)
@@ -83,9 +70,7 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    AddressTownCity addressTownCity = unitOfWork.TownCityRepo.GetByID(TownCityId);
-                    unitOfWork.TownCityRepo.Delete(TownCityId);
-                    unitOfWork.Save();
+                    apiRepo.Delete($"api/maintenance/delete-town-city/{TownCityId}");
                 }
                 catch (Exception e)
                 {
@@ -101,38 +86,31 @@ namespace NorthOps.Ops.Controllers
             return View();
         }
 
+        #region Test
         [ValidateInput(false)]
         public ActionResult UserGridViewPartial()
         {
 
-            return PartialView("_UserGridViewPartial", unitOfWork.UserRepository.Get(includeProperties: "UserRoles"));
+            return PartialView("_UserGridViewPartial", userViewModel.UserGridViewModel());
         }
+        public ActionResult UserFilteringGridViewPartial(GridViewPagerState pager = null, GridViewFilteringState filteringState = null, GridViewColumnState column = null, bool reset = true)
+        {
+            return PartialView("_UserGridViewPartial", userViewModel.UserGridViewModel(column, reset, pager, filteringState));
+        }
+
+
+
+        #endregion
+
 
         [HttpPost, ValidateInput(false)]
         public async Task<ActionResult> UserGridViewPartialAddNew(NorthOps.Ops.Models.User item)
         {
-            var model = new object[0];
             if (ModelState.IsValid)
             {
                 try
                 {
-                    item.Id = Guid.NewGuid().ToString();
-                    var res = await UserManager.CreateAsync(item, item.Password);
-                    if (res.Succeeded)
-                    {
-                        await UserManager.AddToRoleAsync(item.Id, item.userRole);
-                        unitOfWork.JobApplicationRepo.Insert(new JobApplication()
-                        {
-                            JobApplicationId = Guid.NewGuid(),
-                            UserId = item.Id
-                        });
-                        await unitOfWork.SaveAsync();
-                    }
-                    else
-                    {
-                        ViewData["model"] = item;
-                        ViewData["EditError"] = string.Join(Environment.NewLine, res.Errors);
-                    }
+                    await apiRepo.InsertAsync("api/maintenance/insert-user", item);
                 }
                 catch (Exception e)
                 {
@@ -153,8 +131,8 @@ namespace NorthOps.Ops.Controllers
                 ViewData["EditError"] = "Please, correct all errors." + Environment.NewLine + stringBuilder.ToString();
                 ViewData["Model"] = item;
             }
-
-            return PartialView("_UserGridViewPartial", unitOfWork.UserRepository.Get(includeProperties: "UserRoles"));
+            var model = apiRepo.GetFetch<IEnumerable<User>>("api/maintenance/users");
+            return PartialView("_UserGridViewPartial", model);
         }
         [HttpPost, ValidateInput(false)]
         public async Task<ActionResult> UserGridViewPartialUpdate(NorthOps.Ops.Models.User item)
@@ -163,42 +141,7 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    var user = await UserManager.FindByIdAsync(item.Id);
-                    user.FirstName = item.FirstName;
-                    user.LastName = item.LastName;
-                    user.MiddleName = item.MiddleName;
-                    user.Gender = item.Gender;
-                    user.BirthDate = item.BirthDate;
-                    user.AddressLine1 = item.AddressLine1;
-                    user.AddressLine2 = item.AddressLine2;
-                    user.TownCity = item.TownCity;
-                    user.Cellular = item.Cellular;
-                    user.Religion = item.Religion;
-                    user.Citizenship = item.Citizenship;
-                    user.Languages = item.Languages;
-                    user.CivilStatus = item.CivilStatus;
-                    user.Skills = item.Skills;
-                    await UserManager.UpdateAsync(user);
-
-                    #region UpdateRole
-                    var roles = await UserManager.GetRolesAsync(user.Id);
-                    await UserManager.RemoveFromRolesAsync(user.Id, roles.ToArray());
-                    await UserManager.AddToRoleAsync(user.Id, item.userRole);
-                    #endregion
-
-                    if (item.Password != null)
-                    {
-                        var token = await UserManager.GeneratePasswordResetTokenAsync(item.Id);
-                        var res = await UserManager.ResetPasswordAsync(item.Id, token, item.Password);
-#if DEBUG
-                        if (!res.Succeeded)
-                        {
-                            Debug.WriteLine(string.Join(",", res.Errors));
-                        }
-#endif
-                    }
-
-
+                    await apiRepo.UpdateAsync("api/maintenance/update-user", item);
                 }
                 catch (Exception e)
                 {
@@ -220,7 +163,9 @@ namespace NorthOps.Ops.Controllers
                 ViewData["Model"] = item;
             }
 
-            return PartialView("_UserGridViewPartial", unitOfWork.UserRepository.Get(includeProperties: "UserRoles"));
+            var model = apiRepo.GetFetch<IEnumerable<User>>("api/maintenance/users");
+
+            return PartialView("_UserGridViewPartial", model);
         }
         [HttpPost, ValidateInput(false)]
         public async Task<ActionResult> UserGridViewPartialDelete(NorthOps.Ops.Models.User item)
@@ -229,26 +174,21 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-
-                    await UserManager.DeleteAsync(await UserManager.FindByIdAsync(item.Id));
+                    await apiRepo.DeleteAsync($"delete-user/{item.Id}");
                 }
                 catch (Exception e)
                 {
                     ViewData["EditError"] = e.Message;
                 }
             }
-            return PartialView("_UserGridViewPartial", unitOfWork.UserRepository.Get(includeProperties: "UserRoles"));
+            var model = apiRepo.GetFetch<IEnumerable<User>>("api/maintenance/users");
+            return PartialView("_UserGridViewPartial", model);
         }
         [ChildActionOnly]
         public ActionResult UserAddEditPartial(NorthOps.Ops.Models.User item)
         {
-            var user = UserManager.FindById(item.Id);
-            if (user != null)
-            {
-                user.userRole = user.UserRoles.FirstOrDefault() == null ? "" : user.UserRoles.FirstOrDefault().Name;
-
-            }
-            ViewBag.TownCity = new UnitOfWork().TownCityRepo.Get();
+            var user = apiRepo.GetFetch<User>($"api/maintenance/first-user/{item.Id}");
+            ViewBag.TownCity = apiRepo.GetFetch<IEnumerable<AddressTownCity>>("api/maintenance/town-city"); //new UnitOfWork().TownCityRepo.Get();
             return PartialView("_useraddeditpartial", user);
         }
         #endregion

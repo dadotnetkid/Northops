@@ -103,7 +103,7 @@
                         <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "profiledata" ? "active" : "")">
                             <a href="@Url.Action("profiledata", "filemanagementdata")"><i class="fa fa-address-book"></i> <span> Profile Data</span></a>
                         </li>
-                        <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "index" ? "active" : "")">
+                        <li class="@(ViewContext.RouteData.Values["Action"].ToString().ToLower() == "index" && ViewContext.RouteData.Values["Controller"].ToString().ToLower()=="campaign"? "active" : "")">
                             <a href="@Url.Action("index", "campaign")"><i class="fa fa-address-book"></i> <span> Campaign</span></a>
                         </li>
                     </ul>

@@ -94,6 +94,19 @@ namespace NorthOps.Api.Controllers
                 return BadRequest();
             return Ok();
         }
+        [HttpGet, Authorize, Route("api/member/user-login-status")]
+        public IHttpActionResult UserLoginStatus()
+        {
+           return  Ok((from u in UserManager.Users.ToList()
+             where u.Id == User.Identity.GetUserId()
+             select new LoginStatusModel
+             {
+                 Name = u.FullName ?? User.Identity.GetUserName(),
+                 Position = UserManager.GetRoles(User.Identity.GetUserId()).FirstOrDefault(),
+                 HireDate = u.HireDate,
+                 Photo = u.Photo
+             }).FirstOrDefault());
+        }
         #endregion
     }
 }

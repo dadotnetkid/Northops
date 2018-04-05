@@ -63,21 +63,20 @@ namespace NorthOps.Ops.Controllers
         }
         public ActionResult CategoryViewPartial()
         {
-            var model = new object[0];
-            return PartialView("_CategoryViewPartial", unitOfWork.CategoryRepo.Get());
+            var model = apiRepo.GetFetch<Choice>("api/category");
+            //unitOfWork.CategoryRepo.Get()
+            return PartialView("_CategoryViewPartial", model);
         }
 
         [HttpPost, ValidateInput(false)]
         public ActionResult CategoryViewPartialAddNew(NorthOps.Ops.Models.Category item)
         {
-            var model = new object[0];
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    item.CategoryId = Guid.NewGuid();
-                    unitOfWork.CategoryRepo.Insert(item);
-                    unitOfWork.Save();
+                    apiRepo.Insert("api/category/insert", item);
                 }
                 catch (Exception e)
                 {
@@ -86,18 +85,19 @@ namespace NorthOps.Ops.Controllers
             }
             else
                 ViewData["EditError"] = "Please, correct all errors.";
-            return PartialView("_CategoryViewPartial", unitOfWork.CategoryRepo.Get());
+            var model = apiRepo.GetFetch<Choice>("api/category");
+            // unitOfWork.CategoryRepo.Get()
+            return PartialView("_CategoryViewPartial", model);
         }
         [HttpPost, ValidateInput(false)]
         public ActionResult CategoryViewPartialUpdate(NorthOps.Ops.Models.Category item)
         {
-            var model = new object[0];
             if (ModelState.IsValid)
             {
                 try
                 {
-                    unitOfWork.CategoryRepo.Update(item);
-                    unitOfWork.Save();
+                    apiRepo.Update("api/category", item);
+
                 }
                 catch (Exception e)
                 {
@@ -106,26 +106,28 @@ namespace NorthOps.Ops.Controllers
             }
             else
                 ViewData["EditError"] = "Please, correct all errors.";
-            return PartialView("_CategoryViewPartial", unitOfWork.CategoryRepo.Get());
+
+            var model = apiRepo.GetFetch<Choice>("api/category");
+            // unitOfWork.CategoryRepo.Get()
+            return PartialView("_CategoryViewPartial", model);
         }
         [HttpPost, ValidateInput(false)]
         public ActionResult CategoryViewPartialDelete(System.Guid CategoryId)
         {
-            var model = new object[0];
             if (CategoryId != null)
             {
                 try
                 {
-                    Category addressTownCity = unitOfWork.CategoryRepo.GetByID(CategoryId);
-                    unitOfWork.CategoryRepo.Delete(CategoryId);
-                    unitOfWork.Save();
+                    apiRepo.Delete($"api/category/delete/{CategoryId}");
                 }
                 catch (Exception e)
                 {
                     ViewData["EditError"] = e.Message;
                 }
             }
-            return PartialView("_CategoryViewPartial", unitOfWork.CategoryRepo.Get());
+            var model = apiRepo.GetFetch<Choice>("api/category");
+            // unitOfWork.CategoryRepo.Get()
+            return PartialView("_CategoryViewPartial", model);
         }
 
         #endregion
@@ -174,7 +176,7 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    await apiRepo.Update("api/exam/update", item);
+                    await apiRepo.UpdateAsync("api/exam/update", item);
                 }
                 catch (Exception e)
                 {
@@ -248,7 +250,7 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    await apiRepo.Update("api/Choice/update", item);
+                    await apiRepo.UpdateAsync("api/Choice/update", item);
                 }
                 catch (Exception e)
                 {
@@ -282,10 +284,6 @@ namespace NorthOps.Ops.Controllers
         }
 
         #endregion
-
-
-
-
 
         #region Question
         public ActionResult QuestionAddEditPartial(System.Nullable<Guid> QuestionId, System.Nullable<Guid> ExamId)
@@ -333,7 +331,7 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    await apiRepo.Update("api/question/update", item);
+                    await apiRepo.UpdateAsync("api/question/update", item);
                 }
                 catch (Exception e)
                 {

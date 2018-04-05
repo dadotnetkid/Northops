@@ -3,6 +3,7 @@
 @using NorthOps.Ops.Models;
 @using NorthOps.Ops.Repository;
 @using Microsoft.AspNet.Identity;
+@using NorthOps.Ops.ApiRepository;
 <div class="row">
     <div class="col-sm-12 col-md-12 col-lg-12 col-xs-12">
         <div class="pull-left">
@@ -248,21 +249,21 @@
     <div class="col-lg-6">
         @{
             Html.DevExpress().LabelFor(m => m.CampaignId).GetHtml();
-            Html.DevExpress().ComboBoxFor(m => m.CampaignId, txt =>
-            {
-                txt.Width = System.Web.UI.WebControls.Unit.Percentage(100);
-                txt.ShowModelErrors = true;
-                txt.Properties.ValidationSettings.Display = Display.Dynamic;
-                txt.Properties.ValueField = "CampaignId";
-                txt.Properties.TextField = "CampaignName";
+            //Html.DevExpress().ComboBoxFor(m => m.CampaignId, txt =>
+            //{
+            //    txt.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+            //    txt.ShowModelErrors = true;
+            //    txt.Properties.ValidationSettings.Display = Display.Dynamic;
+            //    txt.Properties.ValueField = "CampaignId";
+            //    txt.Properties.TextField = "CampaignName";
 
-            }).BindList(new UnitOfWork().CampaignRepo.Get()).GetHtml();
+            //}).BindList(new UnitOfWork().CampaignRepo.Get()).GetHtml();
         }
     </div>
     <div class="col-lg-6">
         @{
             Html.DevExpress().Label(lbl => { lbl.AssociatedControlName = "UserRolesValue"; lbl.Text = "User Roles"; }).GetHtml();
-            Html.DevExpress().RadioButtonList(cbl =>
+           /* Html.DevExpress().RadioButtonList(cbl =>
             {
                 cbl.Width = System.Web.UI.WebControls.Unit.Percentage(100);
                 cbl.Name = "UserRolesValue";
@@ -284,7 +285,7 @@
                         }
                     }
                 };
-            }).BindList(new UnitOfWork().RoleRepository.Fetch().Select(x => new { Id = x.Id, Name = x.Name }).ToList()).GetHtml();
+            }).BindList(new ApiGenericRepository().GetFetch<UserRole>).GetHtml();*/
         }
 
     </div>

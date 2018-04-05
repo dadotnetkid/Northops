@@ -77,7 +77,7 @@ namespace NorthOps.Ops.Controllers
             {
                 try
                 {
-                    await new ApiGenericRepository().Update("api/recruitment/job-application", item);
+                    await new ApiGenericRepository().UpdateAsync("api/recruitment/job-application", item);
                 }
                 catch (Exception e)
                 {

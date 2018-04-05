@@ -1,7 +1,9 @@
-﻿using NorthOps.Api.Repository;
+﻿using Newtonsoft.Json;
+using NorthOps.Api.Repository;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -12,6 +14,7 @@ namespace NorthOps.Api.Models
         
         public string Password { get; set; }
         public string MemberRoles { get { return string.Join(Environment.NewLine, this.UserRoles.Select(x => x.Name)); } }
+        [NotMapped,JsonIgnore]
         public IEnumerable<UserRole> Rolelist { get { return new UnitOfWork().RoleRepository.Get(); } }
         public string userRole { get; set; }
      

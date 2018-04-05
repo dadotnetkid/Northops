@@ -88,11 +88,18 @@ namespace NorthOps.Ops.ApiRepository
             return JsonConvert.DeserializeObject<T>(await jsonObject.Content.ReadAsStringAsync());
         }
 
-        public async Task<HttpStatusCode> Update(string EndPoint, object model)
+        public async Task<HttpStatusCode> UpdateAsync(string EndPoint, object model)
         {
             HttpContent content = new StringContent(JsonConvert.SerializeObject(model));
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             HttpResponseMessage jsonObject = await client.PostAsync(BaseUrl + EndPoint, content);
+            return jsonObject.StatusCode;
+        }
+        public HttpStatusCode Update(string EndPoint, object model)
+        {
+            HttpContent content = new StringContent(JsonConvert.SerializeObject(model));
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            HttpResponseMessage jsonObject =  client.PostAsync(BaseUrl + EndPoint, content).Result;
             return jsonObject.StatusCode;
         }
         public async Task<HttpStatusCode> DeleteAsync(string EndPoint)

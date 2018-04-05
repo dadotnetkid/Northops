@@ -20,10 +20,10 @@ namespace NorthOps.Ops
 
         public void ConfigureAuth(IAppBuilder app)
         {
-            app.CreatePerOwinContext(NorthOpsEntities.Create);
-            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
-            app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
-            app.CreatePerOwinContext<ApplicationRoleManager>(ApplicationRoleManager.Create);
+            //app.CreatePerOwinContext(NorthOpsEntities.Create);
+            //app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+            //app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
+            //app.CreatePerOwinContext<ApplicationRoleManager>(ApplicationRoleManager.Create);
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {

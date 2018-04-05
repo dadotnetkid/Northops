@@ -9,6 +9,15 @@
         settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Maintenance", Action = "UserGridViewPartialAddNew" };
         settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Maintenance", Action = "UserGridViewPartialUpdate" };
         settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Maintenance", Action = "UserGridViewPartialDelete" };
+        settings.CustomBindingRouteValuesCollection.Add(
+        GridViewOperationType.Paging,
+        new { Controller = "Maintenance", Action = "UserFilteringGridViewPartial" });
+        settings.CustomBindingRouteValuesCollection.Add(
+            GridViewOperationType.Filtering,
+            new { Controller = "Maintenance", Action = "UserFilteringGridViewPartial" });
+        settings.CustomBindingRouteValuesCollection.Add(
+            GridViewOperationType.Sorting,
+            new { Controller = "Maintenance", Action = "UserFilteringGridViewPartial" });
         settings.SettingsEditing.Mode = GridViewEditingMode.EditFormAndDisplayRow;
         settings.SettingsBehavior.ConfirmDelete = true;
 
@@ -40,7 +49,7 @@
             }
             else
             {
-                Html.RenderAction("UserAddEditPartial", new { Id = DataBinder.Eval( ViewData["item"]?? c.DataItem, "Id") });
+                Html.RenderAction("UserAddEditPartial", new { Id = DataBinder.Eval(ViewData["item"] ?? c.DataItem, "Id") });
             }
         });
     });
@@ -49,4 +58,4 @@
         grid.SetEditErrorText((string)ViewData["EditError"]);
     }
 }
-@grid.Bind(Model).GetHtml()
+@grid.BindToCustomData(Model).GetHtml()

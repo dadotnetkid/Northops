@@ -19,6 +19,7 @@ namespace NorthOps.Ops.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private ApiGenericRepository apiRepo = new ApiGenericRepository();
         public ApplicationSignInManager SignInManager
         {
             get => _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
@@ -99,6 +100,8 @@ namespace NorthOps.Ops.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            Request.Cookies[".AspNetAuthorizationToken"].Expires = DateTime.Now.AddDays(-1);
+            Response.Cookies[".AspNetAuthorizationToken"].Expires = DateTime.Now.AddDays(-1);
             return RedirectToAction("Index", "Home");
         }
 
@@ -117,7 +120,7 @@ namespace NorthOps.Ops.Controllers
             var user = new User();
             if (ModelState.IsValid)
             {
-                await new ApiGenericRepository().Update("api/member/update", model);
+                await new ApiGenericRepository().UpdateAsync("api/member/update", model);
                 /*user = await UserManager.FindByIdAsync(model.Id);
                 //user.FirstName = model.FirstName;
                 //user.LastName = model.LastName;
@@ -205,22 +208,12 @@ namespace NorthOps.Ops.Controllers
             return PartialView("_LoginStatus", GetLoginStatus());
         }
 
-        private object GetLoginStatus()
+        private LoginStatusModel GetLoginStatus()
         {
-            //return unitOfWork.UserRepository.Get().Where(u => u.Id == User.Identity.GetUserId()).Select(x => new User { Photo = x.Photo ?? MissingImage() }).FirstOrDefault();
-
-            //UserManager.GetRoles(User.Identity.GetUserId()).FirstOrDefault();
-
-
-            return (from u in UserManager.Users.ToList()
-                    where u.Id == User.Identity.GetUserId()
-                    select new LoginStatusModel
-                    {
-                        Name = u.FullName ?? User.Identity.GetUserName(),
-                        Position = UserManager.GetRoles(User.Identity.GetUserId()).FirstOrDefault(),
-                        HireDate = u.HireDate,
-                        Photo = u.Photo ?? MissingImage()
-                    }).FirstOrDefault();
+   
+            var model = apiRepo.GetFetch<LoginStatusModel>("api/member/user-login-status");
+            model.Photo = model.Photo ?? MissingImage();
+            return model;
         }
 
         private byte[] MissingImage()
